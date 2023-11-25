@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Llamada al comando y guardado del output en el archivo especificado
+pokemon-colorscripts -r > /tmp/login
+
+# Se guarda el nombre del Pokemon
+line=$(head -n 1 /tmp/login)
+
+#Borrar espacios
+#line=${line// /}
+
+# Mostrar Pokemon
+tail -n+2 /tmp/login
+
+acertado="0"
+while [ $acertado -ne "1" ]
+do
+	# Preguntar por el nombre del Pokemon
+	elShell=$(ps -p $$ | tail -n 1 | cut -d " " -f 10)
+	if [[ "elShell" -eq "zsh" ]]
+	then
+		printf >&2 '%s ' 'Who is this Pokemon?'
+		read respuesta
+	else
+		read -p "Who is this Pokemon? " respuesta
+	fi
+	
+	# Comprobar si la respuesta es correcta
+	if [[ "$line" == "$respuesta" ]]
+	then
+		echo "Perfecto"
+		acertado="1"
+	else
+		echo "Cagaste, vuelve a intentarlo."
+		acertado=$[$acertado-1]
+	fi
+
+	# Si lleva tres intentos fallidos, aconsejar que, si el Pokemon parece shiny,
+	# que ponga (shiny) separado por espacio junto al nonmbre del Pokemon
+	if [[ acertado -eq "-3" ]]
+	then
+		echo "CONSEJO: Si el Pokemon te parece que es shiny, escribe '(shiny)' despues del nombre del Pokemon separado por un espacio"
+	fi
+done
